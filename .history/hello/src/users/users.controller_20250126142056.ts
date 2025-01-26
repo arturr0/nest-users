@@ -130,11 +130,6 @@ export class UsersController {
 
   @Post() // POST /users
   create(@Body() user: Omit<User, 'id'>) {
-    // Check if the ID is provided and remove it if it exists
-    if ('id' in user) {
-      delete user.id; // Remove 'id' from the request body if present
-    }
-
     // Automatically assign ID for the first user and increment for subsequent users
     const newUser: User = {
       id: this.nextId.toString(),
@@ -145,47 +140,16 @@ export class UsersController {
     return newUser;
   }
 
-
-  //auto id but not for patch
-//   @Patch(':id') // PATCH /users/:id
-//   update(@Param('id') id: string, @Body() userUpdate: Partial<User>) {
-//     // Find the user and update their details
-//     const userIndex = this.users.findIndex((user) => user.id === id);
-//     if (userIndex === -1) {
-//       return { message: 'User not found' };
-//     }
-//     this.users[userIndex] = { ...this.users[userIndex], ...userUpdate };
-//     return this.users[userIndex];
-//   }
-
-//   @Delete(':id') // DELETE /users/:id
-//   delete(@Param('id') id: string) {
-//     // Find the index of the user and remove them
-//     const userIndex = this.users.findIndex((user) => user.id === id);
-//     if (userIndex === -1) {
-//       return { message: 'User not found' };
-//     }
-//     const deletedUser = this.users.splice(userIndex, 1); // Remove user from array
-//     return { message: 'User deleted successfully', deletedUser: deletedUser[0] };
-//   }
-// }
-
-@Patch(':id') // PATCH /users/:id
-update(@Param('id') id: string, @Body() userUpdate: Partial<User>) {
-  // Find the user by ID
-  const userIndex = this.users.findIndex((user) => user.id === id);
-  if (userIndex === -1) {
-    return { message: 'User not found' };
+  @Patch(':id') // PATCH /users/:id
+  update(@Param('id') id: string, @Body() userUpdate: Partial<User>) {
+    // Find the user and update their details
+    const userIndex = this.users.findIndex((user) => user.id === id);
+    if (userIndex === -1) {
+      return { message: 'User not found' };
+    }
+    this.users[userIndex] = { ...this.users[userIndex], ...userUpdate };
+    return this.users[userIndex];
   }
-
-  // Ensure the 'id' is not part of the update payload
-  const { id: _, ...updateData } = userUpdate; // Remove the 'id' from the update data
-
-  // Update the user with the new data (excluding 'id')
-  this.users[userIndex] = { ...this.users[userIndex], ...updateData };
-  return this.users[userIndex];
-}
-
 
   @Delete(':id') // DELETE /users/:id
   delete(@Param('id') id: string) {
@@ -198,3 +162,4 @@ update(@Param('id') id: string, @Body() userUpdate: Partial<User>) {
     return { message: 'User deleted successfully', deletedUser: deletedUser[0] };
   }
 }
+
